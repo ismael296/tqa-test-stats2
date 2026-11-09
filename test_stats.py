@@ -2,38 +2,44 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="TQA - Prueba Cito")
-st.title("🎾 TQA - Prueba de historial punto a punto")
+st.set_page_config(page_title="TQA - Buscar partidos")
+st.title("🎾 TQA - Buscar partidos por superficie")
 
-MATCH_ID = "s365_2026_4891173"
+BASE_URL = "https://api.citoapi.com/api/v1/tennis"
 
-URL = (
-    "https://api.citoapi.com/api/v1/tennis/"
-    f"matches/{MATCH_ID}/timeline"
-)
+PLAYER_ID = "atp_220693"  # Carlos Alcaraz
 
-st.write("Partido: Alex Michelsen vs Yannick Hanfmann")
-st.write("Torneo: Stockholm · 9 de noviembre de 2026")
+def buscar_partidos(surface):
+    api_key = st.secrets["CITO_API_KEY"]
 
-if st.button("Consultar historial del partido"):
+    response = requests.get(
+        f"{BASE_URL}/matches",
+        headers={"x-api-key": api_key},
+        params={
+            "player_id": PLAYER_ID,
+            "surface": surface,
+            "page": 1,
+            "page_size": 10,
+            "include": "stats"
+        },
+        timeout=30
+    )
+
+    st.write("Código HTTP:", response.status_code)
+    response.raise_for_status()
+    return response.json()
+
+if st.button("Buscar partidos en tierra batida"):
     try:
-        api_key = st.secrets["CITO_API_KEY"]
+        data = buscar_partidos("Clay")
+        st.json(data)
+    except Exception as e:
+        st.error(str(e))
 
-        response = requests.get(
-            URL,
-            headers={"x-api-key": api_key},
-            timeout=30
-        )
+if st.button("Buscar partidos en pista dura"):
+    try:
+        data = buscar_partidos("Hard")
+        st.json(data)
+    except Exception as e:
+        st.error(str(e))
 
-        st.write("Código HTTP:", response.status_code)
-
-        try:
-            data = response.json()
-            st.json(data)
-        except ValueError:
-            st.text(response.text)
-
-    except KeyError:
-        st.error("No se encuentra CITO_API_KEY en Secrets.")
-    except requests.RequestException as error:
-        st.error(f"Error de conexión: {error}")
