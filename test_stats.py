@@ -74,4 +74,39 @@ if st.button("Buscar partidos en pista dura"):
     except Exception as e:
         st.error(str(e))
 
+import streamlit as st
+import requests
 
+st.set_page_config(page_title="TQA - Prueba timeline")
+st.title("🎾 TQA - Prueba timeline en tierra batida")
+
+MATCH_ID = "atp_2026_0410_372"
+
+URL = (
+    "https://api.citoapi.com/api/v1/tennis/"
+    f"matches/{MATCH_ID}/timeline"
+)
+
+if st.button("Consultar timeline"):
+    try:
+        api_key = st.secrets["CITO_API_KEY"]
+
+        response = requests.get(
+            URL,
+            headers={"x-api-key": api_key},
+            timeout=30
+        )
+
+        st.write("Código HTTP:", response.status_code)
+        response.raise_for_status()
+
+        data = response.json()
+
+        st.write("Granularidad:", data.get("granularity"))
+        st.write("Cobertura:", data.get("coverage"))
+        st.write("Eventos:", len(data.get("events", [])))
+
+        st.json(data)
+
+    except Exception as error:
+        st.error(str(error))
