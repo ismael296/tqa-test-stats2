@@ -110,3 +110,25 @@ if st.button("Consultar timeline"):
 
     except Exception as error:
         st.error(str(error))
+
+
+import streamlit as st
+import requests
+
+st.title("TQA - Control de API")
+
+if st.button("Consultar consumo de Cito"):
+    try:
+        response = requests.get(
+            "https://api.citoapi.com/api/v1/health",
+            headers={
+                "x-api-key": st.secrets["CITO_API_KEY"]
+            },
+            timeout=30
+        )
+
+        st.write("HTTP:", response.status_code)
+        st.json(response.json())
+
+    except Exception as error:
+        st.error(str(error))
