@@ -7,7 +7,7 @@ st.title("🎾 TQA - Buscar partidos por superficie")
 
 BASE_URL = "https://api.citoapi.com/api/v1/tennis"
 
-PLAYER_ID = "atp_220693"  # Carlos Alcaraz
+PLAYER_ID = "atp_207989"  # Carlos Alcaraz
 
 def buscar_partidos(surface):
     api_key = st.secrets["CITO_API_KEY"]
